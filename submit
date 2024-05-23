@@ -1,0 +1,180 @@
+#! /usr/bin/python3
+
+# import necessary libraries
+import sys
+import time
+import base64
+import subprocess
+from datetime import datetime
+
+# The function get_input reads the content of the file
+# Decodes the encoded file and split the input ny '-----'
+# Return the inputs if the file exists
+def get_input(basename):
+	user_inputs = []
+	try:
+		with open("/java_lab/private_test/" + basename, 'r') as fp:
+			user_input = fp.read()
+			user_input = base64.b64decode(user_input)
+			user_input = user_input.decode()
+			t = ''
+			for i in user_input.splitlines():
+				if '-----' in i:
+					user_inputs.append(t)
+					t = ''
+				else:
+					t = i + '\n'
+
+		return user_inputs
+
+	except FileNotFoundError:
+		print(f"Program: `{basename}` Not Found!!!")
+		sys.exit(0)
+
+# The function evaluate check the program exist or not
+# Checks the programming language using extension and execute based on that
+# if the file is Java it executes the compiled binary
+# Run the test cases and check the output of both user and host program
+# return the fail_count, total_count, total_time
+
+def evaluate(basename, extension, user_inputs, prog_file):
+	total_count = 0
+	fail_count = 0
+	total_time = 0
+	status = True
+	IS_JAVA = False
+	for user_input in user_inputs:
+		try:
+
+			exe_fp = "/java_lab/executables/"+basename
+			host_run = subprocess.Popen([""+exe_fp], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+			match extension:
+				case 'java':
+					compile = subprocess.run(["javac", prog_file], capture_output=True)
+					if compile.returncode != 0:
+						return True, 'Compilation Error'
+
+					user_run = subprocess.Popen(["java", basename], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+					IS_JAVA = True
+
+				case 'py':
+					user_run = subprocess.Popen(["python3", prog_file], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+				case _:
+					print(f"File Format [{extension}] Not Compatable!!!")
+					sys.exit(0)
+
+			start_time = time.time()
+			user_out, user_err = user_run.communicate(timeout=10, input=user_input.encode())
+			end_time = time.time()
+			total_time += (end_time - start_time)
+
+			host_out, host_err = host_run.communicate(timeout=10, input=user_input.encode())
+
+		except subprocess.TimeoutExpired:
+			user_err = 'Time Limit Exceeded'
+			return True, user_err
+
+		if user_run.returncode != 0:
+			return True, 'Runtime Error'
+
+		elif user_out != host_out:
+			status =  False
+
+		total_count += 1
+		fail_count += 0 if status else 1
+
+		if IS_JAVA:
+			subprocess.run(["rm", f'{basename}.class'])
+
+	return False, total_count, fail_count, total_time
+
+
+# The function display_result prints the result in the Tabular format
+# Print "The Submission Report"
+# If anyone Test case caused Error , it shows the 'Error Occured'
+# Not display the failed count and passed count
+def display_result(ERROR_OCCURED, total_time = '-', total_count = '-', fail_count = '-'):
+	submission_status = '\u2713' if fail_count == 0 and not ERROR_OCCURED else '\u2717'
+
+	print()
+	print('--------------------------------------------------')
+	print("|\t\tSUBMISSION REPORT \t\t |")
+	print('--------------------------------------------------')
+	if ERROR_OCCURED:
+		print("|Status\t\t   :\t\t ERROR OCCURED...|")
+		print('--------------------------------------------------')
+
+	else:
+		print(f"|Test Case Passed  : \t\t\t\t{total_count - fail_count}|")
+		print('--------------------------------------------------')
+		print(f"|Test Case Failed  : \t\t\t\t{fail_count}|")
+		print('--------------------------------------------------')
+		print(f"|Time Taken        : \t\t\t  ", end = '') #{total_time:.2f}ms|")
+		if total_time < 100:
+			print(f"{total_time:.2f}ms|")
+		else:
+			print(f"{total_time:.1f}ms|")
+		print('--------------------------------------------------')
+
+	print(f"|Submission Status : \t\t\t\t{submission_status}|")
+	print('--------------------------------------------------')
+
+# The function update_log logs the result in the CSV format
+# the log file is located in "/var/log/java_lab.log"
+# it logs the result with the username
+def update_log(basename, prog_lang, total_count = '-', fail_count = '-', total_time = '-', status = ''):
+	with open("/var/log/java_lab.log", 'a') as fp:
+		username = subprocess.run("whoami", capture_output=True, text=True)
+		username = username.stdout.splitlines()[0]
+
+		if status != '':
+			t = f'{datetime.now()},{username},{basename},{prog_lang},{status},-,-,-\n'
+		else:
+			status = 'Sucessful' if fail_count == 0 else 'Failed'
+			t = f'{datetime.now()},{username},{basename},{prog_lang},{status},{fail_count},{total_count - fail_count},{total_time}\n'
+
+		fp.write(t)
+
+
+argv = sys.argv
+
+# Checking the file is given as Command Line Argument or not
+# If not given print "Not Found" and exit the program
+
+if len(argv) == 1:
+	print("Source File Not Found.....")
+	print("Usage: argv[0] <source file>")
+	sys.exit(0)
+
+# Spliting the program name from the given file
+# Creating the user_inputs list to store the inputs
+
+basename = argv[1].split('.')[0]
+user_inputs = get_input(basename)
+
+# Split the extension and decide the programming language
+extension = argv[1].split('.')[-1]
+prog_lang = ''
+
+if extension == 'py':
+	prog_lang = 'Python'
+
+if extension == 'java':
+	prog_lang = 'Java'
+
+result = evaluate(basename, extension, user_inputs, argv[1])
+
+# Call the functions based on the result of the Evaluation
+if len(result) == 2:
+	ERROR_OCCURED, status = result
+	update_log(basename, prog_lang, status=status)
+	display_result(ERROR_OCCURED)
+else:
+	ERROR_OCCURED, total_count, fail_count, total_time = result
+	total_time = (total_time / total_count) * 1000
+	
+	update_log(basename, prog_lang, total_count, fail_count, total_time)
+	display_result(ERROR_OCCURED, total_time, total_count, fail_count)
+

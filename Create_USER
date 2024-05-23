@@ -1,0 +1,20 @@
+#! /bin/bash
+
+# Accessing the userlist.txt
+file="/home/username/project/userlist.txt"
+
+# Reading the file in while loop
+# Iterating the username in the text file
+
+while IFS= read -r user;do 
+  # Checking that the user already exists or not
+  # if exists print "user already exist" or else Create new user
+	if id "$user" &>/dev/null; then
+		echo "$user already exists, skipping......"
+	else
+		sudo useradd -m "$user" -s /bin/bash
+		echo "$user created Sucessfully... "
+		echo "$user:$user@09876" | sudo chpasswd
+		echo "Password for $user : $user@09876"
+	fi
+done < "$file"

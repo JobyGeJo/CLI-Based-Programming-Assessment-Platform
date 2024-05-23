@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+# Iterate over each user's home directory and copy the file
+for user_home in /home/*; do
+    # Extract the username from the home directory path
+    username=$(basename "$user_home")
+
+    # Check if the user is a valid user
+    if id "$username" &>/dev/null; then
+        # Copy the file to the user's home directory
+        mkdir "$user_home/Programs"
+        mkdir "$user_home/Programs/Java/"
+        chmod 777 "$user_home/Programs/Java"
+        mkdir "$user_home/Programs/Python"
+        chmod 777 "$user_home/Programs/Python"
+
+        echo "File '$file_to_copy' copied to '$user_home' for user '$username'"
+    else
+        echo "User '$username' does not exist, skipping..."
+    fi
+done

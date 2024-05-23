@@ -1,0 +1,99 @@
+#! /usr/bin/python3
+
+# import necessary libraries
+import sys
+import subprocess
+import base64
+
+
+argv = sys.argv
+
+# Checking the file is given as Command Line Argument or not
+# If not given print "Not Found" and exit the program
+if len(argv) == 1:
+	print("Source File Not Found.....")
+	print(f"Usage: {argv[0]} <source file>")
+	sys.exit(0)
+
+# Spliting the program name from the given file
+# Creating the user_inputs list to store the inputs
+basename = argv[1].split('.')[0]
+user_inputs = []
+
+# Checking that program is found in the base or not using try - except
+# if the file is not found print "Not Found" and exit the program
+try:
+	with open("/java_lab/public_test/" + basename, 'r') as fp:
+
+		user_input = fp.read() 						# Reading the encoded file
+		user_input = base64.b64decode(user_input)   # Decoding the encoded test case
+		user_input = user_input.decode()			# Convert the bytestring to String
+		t = ''
+
+		# Iterating the content and split the testcase by '-----'
+		for i in user_input.splitlines():
+			if '-----' in i:
+				user_inputs.append(t)
+				t = ''
+			else:
+				t += i + '\n'
+except FileNotFoundError:
+	print(f"Program: `{basename}` Not Found!!!")
+	sys.exit(0)
+
+# Storing the result in a tabular format
+# Make status default as passed if any error occurs or the output mismatches
+# Change it as Failed or Error based on the situation
+
+result = '  ' + '-' * 44 + '\n'
+i = 1
+for user_input in user_inputs:
+	status = 'Passed', '\u2713'
+
+	# Running the Host program and user program file
+	# if it causes timeout error then store it as Time limit exceeded
+	try:
+		extension = argv[1].split('.')[-1]
+		exe_fp = "/java_lab/executables/"+basename
+		host_run = subprocess.Popen([""+exe_fp], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+		# Running the file based on the programming language
+		# if the file format is not python or java, print "Not Comapatble"
+
+		match extension:
+			case 'java':
+				user_run = subprocess.Popen(["java", argv[1]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+			case 'py':
+				user_run = subprocess.Popen(["python3", argv[1]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+			case _:
+				print(f"File Format [{extension}] Not Compatable!!!")
+				sys.exit(0)
+
+		host_out, host_err = host_run.communicate(timeout=10, input=user_input.encode())
+		user_out, user_err = user_run.communicate(timeout=10, input=user_input.encode())
+
+
+	except subprocess.TimeoutExpired:
+		user_err = b'Time Limit Exceeded\n'
+
+
+	if user_run.returncode != 0:			# If the returncode is not 0
+	 	status = 'Error', '\u2717'			# The program is exited by error
+	elif user_out != host_out:				# if both of the output is not equal
+		status =  'Failed', '\u2717'		# Change the status as failed
+
+	result += f'  |     Test Case {i}{"":5}|     {status[0]:10}| {status[1]}  |\n'
+	result += '  ' +  '-' * 44 + '\n'
+
+	# Print the output if it doesn't cause the Error
+	# Else Print the Error Message
+	print(f'Expected Output: ')
+	print(host_out.decode())
+	print(f'Actual Output: ')
+	print(user_out.decode() if status[0] != 'Error' else user_err.decode())
+	i += 1
+
+
+print(result)

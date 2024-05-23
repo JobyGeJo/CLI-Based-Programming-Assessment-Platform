@@ -1,0 +1,57 @@
+#!/bin/bash
+
+if [ "$#" -ne 1 ]; then
+    echo "Usage: $0 <file_to_copy>"
+    exit 1
+fi
+
+# Get the file to copy from the command line argument
+file_to_copy="$1"
+
+# Check if the file exists
+if [ ! -f "$file_to_copy" ]; then
+    echo "File not found: $file_to_copy"
+    exit 1
+fi
+
+# Iterate over each user's home directory and copy the file
+for user_home in /home/*; do
+    # Extract the username from the home directory path
+    username=$(basename "$user_home")
+
+    # Check if the user is a valid user
+    if id "$username" &>/dev/null; then
+        # Copy the file to the user's home directory
+        # Comment the question using `/* */` and store it as Java file
+
+	      echo "/*" > "$user_home/Programs/Java/$file_to_copy.java"
+	      cat "$file_to_copy" >> "$user_home/Programs/Java/$file_to_copy.java"
+	      echo "*/" >> "$user_home/Programs/Java/$file_to_copy.java"
+
+	chmod -R 777 "$user_home/Programs/Java/$file_to_copy.java"
+        echo "File '$file_to_copy.java' copied to '$user_home' for user '$username'"
+    else
+        echo "User '$username' does not exist, skipping..."
+    fi
+done
+
+for user_home in /home/*; do
+    # Extract the username from the home directory path
+    username=$(basename "$user_home")
+
+    # Check if the user is a valid user
+    if id "$username" &>/dev/null; then
+        # Copy the file to the user's home directory
+        # Comment the question using " ''' " and store it as Python file
+
+       	echo "'''" > "$user_home/Programs/Python/$file_to_copy.py"
+	      cat "$file_to_copy" >> "$user_home/Programs/Python/$file_to_copy.py"
+	      echo "'''" >> "$user_home/Programs/Python/$file_to_copy.py"
+	      chmod -R 777 "$user_home/Programs/Python/$file_to_copy.py"
+
+        echo "File '$file_to_copy.py' copied to '$user_home' for user '$username'"
+    else
+        echo "User '$username' does not exist, skipping..."
+    fi
+done
+

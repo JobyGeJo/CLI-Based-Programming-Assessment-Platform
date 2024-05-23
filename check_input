@@ -1,0 +1,44 @@
+#! /usr/bin/python3
+
+import sys
+import subprocess
+
+argv = sys.argv
+
+if len(argv) < 2:
+	print("Input or Source Not Found.....")
+	print(f"Usage: {argv[0]} <input file> <source file>")
+	exit(0)
+
+user_input = ''
+fp = argv[1]
+try:
+	with open(fp, 'r') as fp:
+		user_input += fp.read()
+except FileNotFoundError:
+	print(f"File: `{fp}` Not Found!!!")
+
+try:
+
+	user_run = subprocess.Popen(["python3", argv[2]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	host_run = subprocess.Popen(["", "/java_lab/executables/" + argv[2]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	user_out, user_err = user_run.communicate(timeout=10, input=user_input.encode())
+	host_out, host_err = host_run.communicate(timeout=10, input=user_input.encode())
+
+except subprocess.TimeoutExpired:
+	user_out = 'Time Limit Exceeded'
+
+if  host_run.returncode != 0:
+	print("Constraint Error...")
+	exit(0)
+
+if user_run.returncode != 0:
+	print("Your program has encountered Error:")
+	print(user_err)
+	exit(0)
+
+
+print(f"{'Actual Output':30}")
+print(f"{user_out.decode():30}")
+print(f"{'Expected Output': 30}")
+print(f"{host_out.decode():30}")
