@@ -19,24 +19,24 @@ env_path = f"/home/username/project/Environment/{argv[1]}/"
 # Checking the file exist or not
 # if not print "File not Found"
 # if the file exist convert the python file into Linux Executables
-# Store it in the path /java_lab/executables/
+# Store it in the path /program_lab/executables/
 try:
         exe = subprocess.run(["pyinstaller", f"{env_path}{argv[1]}.py", "--onefile"])
         exe_path = f"/home/karthi/project/Executables/dist/{argv[1]}"
 
         with open(exe_path, 'rb') as fp:
-                with open("/java_lab/executables/" + argv[1], 'wb') as fp2:
+                with open("/program_lab/executables/" + argv[1], 'wb') as fp2:
                         fp2.write(fp.read())
-        exe = subprocess.run(["chmod",  "+x", f"/java_lab/executables/{argv[1]}"])
+        exe = subprocess.run(["chmod",  "+x", f"/program_lab/executables/{argv[1]}"])
 
 except FileNotFoundError:
         print(f"File: `{argv[1]}.py` Not Found!!!")
 
 # if the file exist it encode the file
-# Store it in the path /java_lab/public_test/
+# Store it in the path /program_lab/public_test/
 try:
         with open(f"{env_path}{argv[1]}.pub", 'r') as fp:
-                with open("/java_lab/public_test/" + argv[1], 'wb') as fp2:
+                with open("/program_lab/public_test/" + argv[1], 'wb') as fp2:
                         content = fp.read()
                         content = content.encode()
                         encoded_content = base64.b64encode(content)
@@ -46,10 +46,10 @@ except FileNotFoundError:
         print(f"File: `{argv[1]}.pub` Not Found!!!")
 
 # if the file exist it encode the file
-# Store it in the path /java_lab/private_test/
+# Store it in the path /program_lab/private_test/
 try:
         with open(f"{env_path}{argv[1]}.pri", 'r') as fp:
-                with open("/java_lab/private_test/" + argv[1], 'wb') as fp2:
+                with open("/program_lab/private_test/" + argv[1], 'wb') as fp2:
                         content = fp.read()
                         content = content.encode()
                         encoded_content = base64.b64encode(content)
@@ -59,10 +59,10 @@ except FileNotFoundError:
         print(f"File: `{argv[1]}.pri` Not Found!!!")
 
 # if the file exist it encode the file
-# Store it in the path /java_lab/Questions/
+# Store it in the path /program_lab/Questions/
 try:
         with open(f"{env_path}{argv[1]}.Q", 'r') as fp:
-                with open("/java_lab/Questions/" + argv[1], 'w') as fp2:
+                with open("/program_lab/Questions/" + argv[1], 'w') as fp2:
                         content = fp.read()
                         fp2.write(content)
 

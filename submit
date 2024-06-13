@@ -13,7 +13,7 @@ from datetime import datetime
 def get_input(basename):
 	user_inputs = []
 	try:
-		with open("/java_lab/private_test/" + basename, 'r') as fp:
+		with open("/program_lab/private_test/" + basename, 'r') as fp:
 			user_input = fp.read()
 			user_input = base64.b64decode(user_input)
 			user_input = user_input.decode()
@@ -46,7 +46,7 @@ def evaluate(basename, extension, user_inputs, prog_file):
 	for user_input in user_inputs:
 		try:
 
-			exe_fp = "/java_lab/executables/"+basename
+			exe_fp = "/program_lab/executables/"+basename
 			host_run = subprocess.Popen([""+exe_fp], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 			match extension:
@@ -122,10 +122,10 @@ def display_result(ERROR_OCCURED, total_time = '-', total_count = '-', fail_coun
 	print('--------------------------------------------------')
 
 # The function update_log logs the result in the CSV format
-# the log file is located in "/var/log/java_lab.log"
+# the log file is located in "/var/log/program_lab.log"
 # it logs the result with the username
 def update_log(basename, prog_lang, total_count = '-', fail_count = '-', total_time = '-', status = ''):
-	with open("/var/log/java_lab.log", 'a') as fp:
+	with open("/var/log/program_lab.log", 'a') as fp:
 		username = subprocess.run("whoami", capture_output=True, text=True)
 		username = username.stdout.splitlines()[0]
 

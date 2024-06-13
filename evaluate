@@ -23,7 +23,7 @@ user_inputs = []
 # Checking that program is found in the base or not using try - except
 # if the file is not found print "Not Found" and exit the program
 try:
-	with open("/java_lab/public_test/" + basename, 'r') as fp:
+	with open("/program_lab/public_test/" + basename, 'r') as fp:
 
 		user_input = fp.read() 						# Reading the encoded file
 		user_input = base64.b64decode(user_input)   # Decoding the encoded test case
@@ -54,7 +54,7 @@ for user_input in user_inputs:
 	# if it causes timeout error then store it as Time limit exceeded
 	try:
 		extension = argv[1].split('.')[-1]
-		exe_fp = "/java_lab/executables/"+basename
+		exe_fp = "/program_lab/executables/"+basename
 		host_run = subprocess.Popen([""+exe_fp], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
 		# Running the file based on the programming language
