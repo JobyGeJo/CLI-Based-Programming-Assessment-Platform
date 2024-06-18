@@ -52,10 +52,16 @@ Copies the specified question file to the Java and Python folders within the `Pr
 Creates a `Programs` directory in the home directory of each user and sets up `Python` and `Java` directories as subdirectories.
 
 ### EVALUATE
-...
+Evaluates the Public Test Case for the Given Programming Questions and Shows the Actual Output and Expected Output and Shows the Result in the Tabular Format. If the program causes any error it shows that 'ERROR OCCURED' in the result. If the program exceeds the given time limit, it
+shows that the time limit exceeded.
+
+Result consist the information of the number of test cases and the count of passed test cases and failed test cases in Tabular format 
 
 ### SUBMIT
-...
+Evaluate the Private Test Case for the Given Programming Questions and Shows the Submission Report in the Tabular format. Submission Report Consist of the total number of test cases and the count of passed and failed test cases.
+and the Runtime of the program. If the program causes any error, it displays the message 'ERROR OCCURED' in Submission Report.
+
+`SUBMIT` command logs the submission information in the log file located in `/var/log/program_labs`. Log file consist of the information about the username, time, programming language used, program name, passed test case count, failed test case count, runtime. Log file stores these information in CSV (Comma Seperated Value) Format.
 
 ## Directory Structure
 ### Admin home Directory
