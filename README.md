@@ -211,7 +211,7 @@ After writing the program for the given question.
 EVALUALTE fact
 ```
 `EVALUATE` command is used to evalute public test case. it also shows the error with error message if any occurs.
-The output format is: <img src="assets\eval.png">
+The output format is: ![Evaluate Example](https://github.com/Karthi-J7/CLI-Based-Programming-Assessment-Platform/blob/main/assets/eval.png)
 ```shell
 SUBMIT fact
 ```
