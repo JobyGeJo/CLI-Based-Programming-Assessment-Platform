@@ -204,7 +204,7 @@ Find the Factorial for the given number.
 ```shell
 ./SETQUESTION fact
 ```
-
+Sample working example for [Admin workflow](https://github.com/Karthi-J7/CLI-Based-Programming-Assessment-Platform/blob/main/assets/lab_setup.mp4)  
 ### User Workflow
 After writing the program for the given question.
 ```shell
