@@ -217,6 +217,9 @@ SUBMIT fact
 ```
 `SUBMIT` command is used to evalute private test case and log the submission information. it ERROR_OCCURED if any error occurs.
 The output format is:<img src="assets\submit.png">
+
+Sample working example for [User workflow](https://drive.google.com/file/d/1aBq5ia9krF-7RYVw7RXrwHn20IONj1C5/view?usp=sharing)  
+
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request on GitHub.
 
