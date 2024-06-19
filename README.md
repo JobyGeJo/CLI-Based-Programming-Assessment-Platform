@@ -216,7 +216,7 @@ The output format is: ![Evaluate Example](https://github.com/Karthi-J7/CLI-Based
 SUBMIT fact
 ```
 `SUBMIT` command is used to evalute private test case and log the submission information. it ERROR_OCCURED if any error occurs.
-The output format is:<img src="assets\submit.png">
+The output format is:![Submit Example](https://github.com/Karthi-J7/CLI-Based-Programming-Assessment-Platform/blob/main/assets/submit.png)
 
 Sample working example for [User workflow](https://drive.google.com/file/d/1aBq5ia9krF-7RYVw7RXrwHn20IONj1C5/view?usp=sharing)  
 
