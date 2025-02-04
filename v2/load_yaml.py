@@ -1,6 +1,13 @@
 from typing import Any
 import yaml
 
+class TestCasesNotFoundError(Exception):
+    def __init__(self, meassage: str, *args: object):
+        super().__init__(args)
+        self.message = meassage
+
+    pass
+
 class LoadYaml:
 
     def __init__(self, filename: str) -> None:
@@ -10,8 +17,11 @@ class LoadYaml:
     
     def __load_yaml(self) -> dict[str, Any]:
         if self._yaml_cache is None:  # Load only once
-            with open(f'testcases/{self.filename}.yaml') as f:
-                self._yaml_cache = yaml.safe_load(f)
+            try:
+                with open(f'testcases/{self.filename}.yaml') as f:
+                    self._yaml_cache = yaml.safe_load(f)
+            except FileNotFoundError:
+                raise TestCasesNotFoundError(f'testcases/{self.filename}.yaml not found')
         return self._yaml_cache
 
     def get_test_cases(self) -> list[tuple[str, Any, Any]]:

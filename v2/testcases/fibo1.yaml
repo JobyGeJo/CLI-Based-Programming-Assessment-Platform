@@ -64,4 +64,4 @@ tests:
       n: 50
     expected_output: 12586269025
 
-timeout: 30
+timeout: 5
