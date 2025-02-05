@@ -20,6 +20,12 @@ class SolutionNotFoundError(Exception):
         super().__init__(message)  # ✅ Pass a string, not a tuple!
         self.message = message
 
+class SomethingWentWrongError(Exception):
+
+    def __init__(self, message="Something went wrong"):
+        super().__init__(message)
+        self.message = message
+
 def set_Tester(test_cases: LoadYaml):
 
     class TestMathOperations(unittest.TestCase):
@@ -30,9 +36,14 @@ def set_Tester(test_cases: LoadYaml):
                 import Solution
                 cls.function = getattr(Solution, test_cases.filename)  # Fetch function reference
             except Exception as e:
-                TestRunner.exception_type = SolutionNotFoundError
-                TestRunner.exception_message = e.__str__()
-                raise SolutionNotFoundError(TestRunner.exception_message)
+                if isinstance(e, SyntaxError | AttributeError):
+                    TestRunner.exception_type = SolutionNotFoundError
+                    TestRunner.exception_message = str(e)
+                    raise SolutionNotFoundError(TestRunner.exception_message)
+                else:
+                    TestRunner.exception_type = SomethingWentWrongError
+                    TestRunner.exception_message = str(e)
+                    raise SomethingWentWrongError(TestRunner.exception_message)
 
         @parameterized.expand(test_cases.get_test_cases)
         @timeout_decorator.timeout(test_cases.get_timelimit())
@@ -51,7 +62,7 @@ class TestRunner(unittest.TextTestRunner):
     exception_type = None
     exception_message = None
 
-    def __init__(self, test_cases, *args, verbosity=2, failfast=True, **kwargs) -> None:
+    def __init__(self, test_cases, *args, verbosity=2, failfast: bool = True, **kwargs) -> None:
         super().__init__(*args, verbosity=verbosity, failfast=failfast, **kwargs)
         self.tester = set_Tester(test_cases)
 
@@ -97,8 +108,10 @@ class TestRunner(unittest.TextTestRunner):
         else:
             # Print the total time taken (in milliseconds)
             print("❌ Some tests failed.")
-            print(TestRunner.exception_type)
-            print(TestRunner.exception_message)
+            print(TestRunner.exception_type, type(TestRunner.exception_type))
+            print(TestRunner.exception_message, type(TestRunner.exception_message))
+            args['exception_type'] = TestRunner.exception_type
+            args['exception_message'] = TestRunner.exception_message
 
             try:
                 raise TestRunner.exception_type

@@ -1,7 +1,6 @@
 from functools import lru_cache
 
 def fibo1(n):
-    # if n == 39
     if n == 0:
         return 0
     if n == 1 or n == 2:

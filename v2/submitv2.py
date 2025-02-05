@@ -10,7 +10,7 @@ if len(sys.argv) == 1:
 	print("Source File Not Found.....")
 	print("Usage: argv[0] <source file>")
 
-	basename = 'fibo1'
+	basename = 'fibo2'
 	print(f"Using {basename}")
 	# test_cases = load_yaml.LoadYaml(basename)
 
@@ -31,24 +31,38 @@ else:
 # Print "The Submission Report"
 # If anyone Test case caused Error , it shows the 'Error Occured'
 # Not display the failed count and passed count
-def display_result(total_count: int, total_time: float = 0, status = Status.PASSED):
+def display_result(status: Status, exception_type: Exception | None = None, exception_message: str = '', total_count: int = 0, total_time: float = 0):
 
-	width = 50  # Total width of the report
+	width = 60  # Total width of the report
+	heading_width = width - 2
+	content_width = width - 25
 	separator = "-" * width
 
-	report = f"""
-{separator}
-|{'SUBMISSION REPORT'.center(width - 2)}|
-{separator}
-|{'Test Case Passed  :'.ljust(width - 6)} {str(total_count).ljust(3)}|
-{separator}
-|{'Time Taken        :'.ljust(width - 11)} {total_time: .2f} {'ms'.rjust(1)}|
-{separator}
-|{'Submission Status :'.ljust(width - 9)} {status.value.center(3)}|
-{separator}
-		    """
-
-	print(report)
+	if status == Status.PASSED:
+		print("here")
+		print(
+			f"{separator}\n"
+			f"|{'SUBMISSION REPORT':^{heading_width}}|\n"
+			f"{separator}\n"
+			f"|{' Test Case Passed':<20}: {total_count:>{content_width}} |\n"
+			f"{separator}\n"
+			f"|{' Time Taken':<20}: {f"{total_time:.2f} ms":>{content_width}} |\n"
+			f"{separator}\n"
+			f"|{' Submission Status':<20}: {status.value:>{content_width}} |\n"
+			f"{separator}"
+		)
+	else:
+		print(
+			f"{separator}\n"
+			f"|{'SUBMISSION REPORT':^{heading_width}}|\n"
+			f"{separator}\n"
+			f"|{' Submission Status':<20}: {status.value:<{content_width}} |\n"
+			f"{separator}\n"
+			f"|{' Exception':<20}: {exception_type.__name__:<{content_width}} |\n"
+			f"{separator}\n"
+			f"|{' Exception Message':<20}: {str(exception_message):<{content_width}} |\n"
+			f"{separator}"
+		)
 
 if __name__ == '__main__':
 	display_result(**dynamic_tester.main(basename))

@@ -9,4 +9,4 @@ class Status(Enum):
     OLE = 'Output Limit Exceeded'
     RUNTIME_ERROR = 'Runtime Error'
     SYNTAX_ERROR = 'Syntax Error'
-    SWW = 'Something Went Wrong'
+    SOMETHING_WENT_WRONG = 'Something Went Wrong'
