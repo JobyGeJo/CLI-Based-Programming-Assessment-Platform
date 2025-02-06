@@ -1,11 +1,21 @@
 from functools import lru_cache
 
 def fibo1(n):
+    if n ==20:
+        print("Avan dhan da periya velaiya pathu vitan")
+        raise NotImplementedError("Venum nu dhan da NotImplemented la poten.. Apo dhan Banner correct huh work aguthanu ennala pakka mudiyum")
+    # elif n == 29:
+    #     raise ZeroDivisionError("JustCheckingWeatherTheTextWrapperCanHandleALongString")
+    # elif n == 24:
+    #     return 0
+    print(n)
     if n == 0:
         return 0
     if n == 1 or n == 2:
         return 1
-    return fibo1(n-1) + fibo1(n-2)
+    return fibo1(n-2) + fibo1(n-1)
+
+
 
 @lru_cache
 def fibo2(n):
@@ -47,5 +57,4 @@ def is_prime_good(n):
     return True
 
 if __name__ == '__main__':
-    print(fibo2(990))
-    fibo2.cache_clear()
+    print(fibo2(5))

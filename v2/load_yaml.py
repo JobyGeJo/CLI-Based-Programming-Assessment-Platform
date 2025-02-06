@@ -2,11 +2,9 @@ from typing import Any
 import yaml
 
 class TestCasesNotFoundError(Exception):
-    def __init__(self, meassage: str, *args: object):
-        super().__init__(args)
-        self.message = meassage
-
-    pass
+    def __init__(self, message: str):
+        super().__init__(message)
+        self.message = message
 
 class LoadYaml:
 
