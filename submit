@@ -11,6 +11,18 @@ from datetime import datetime
 # Decodes the encoded file and split the input ny '-----'
 # Return the inputs if the file exists
 def get_input(basename):
+	"""
+	    Reads the test input file, decodes the base64-encoded content, and splits the input based on '-----'.
+
+	    Args:
+	        basename (str): The base name of the source file (without extension).
+
+	    Returns:
+	        list: A list of test case inputs.
+
+	    Raises:
+	        FileNotFoundError: If the input file does not exist.
+	"""
 	user_inputs = []
 	try:
 		with open("/program_lab/private_test/" + basename, 'r') as fp:
@@ -36,8 +48,20 @@ def get_input(basename):
 # if the file is Java it executes the compiled binary
 # Run the test cases and check the output of both user and host program
 # return the fail_count, total_count, total_time
-
 def evaluate(basename, extension, user_inputs, prog_file):
+	"""
+	    Evaluates the user program by executing it against predefined test cases and comparing its output.
+
+	    Args:
+	        basename (str): The base name of the program.
+	        extension (str): The programming language extension ('py' or 'java').
+	        user_inputs (list): The list of test case inputs.
+	        prog_file (str): The full filename of the user's program.
+
+	    Returns:
+	        tuple: If an error occurs, returns (True, 'Error Message'). Otherwise, returns
+	               (False, total test count, failed test count, total execution time in milliseconds).
+	"""
 	total_count = 0
 	fail_count = 0
 	total_time = 0
@@ -96,6 +120,15 @@ def evaluate(basename, extension, user_inputs, prog_file):
 # If anyone Test case caused Error , it shows the 'Error Occured'
 # Not display the failed count and passed count
 def display_result(ERROR_OCCURED, total_time = '-', total_count = '-', fail_count = '-'):
+	"""
+	    Displays the submission report in a tabular format.
+
+	    Args:
+	        ERROR_OCCURED (bool): True if an error occurred, False otherwise.
+	        total_time (float, optional): Total execution time. Defaults to '-'.
+	        total_count (int, optional): Total number of test cases. Defaults to '-'.
+	        fail_count (int, optional): Number of failed test cases. Defaults to '-'.
+	"""
 	submission_status = '\u2713' if fail_count == 0 and not ERROR_OCCURED else '\u2717'
 
 	print()
@@ -125,6 +158,17 @@ def display_result(ERROR_OCCURED, total_time = '-', total_count = '-', fail_coun
 # the log file is located in "/var/log/program_lab.log"
 # it logs the result with the username
 def update_log(basename, prog_lang, total_count = '-', fail_count = '-', total_time = '-', status = ''):
+	"""
+	    Logs the result of the program evaluation in a CSV format.
+
+	    Args:
+	        basename (str): The base name of the program.
+	        prog_lang (str): The programming language used.
+	        total_count (int, optional): Total number of test cases. Defaults to '-'.
+	        fail_count (int, optional): Number of failed test cases. Defaults to '-'.
+	        total_time (float, optional): Total execution time. Defaults to '-'.
+	        status (str, optional): The final status ('Successful' or 'Failed'). Defaults to ''.
+	"""
 	with open("/var/log/program_lab.log", 'a') as fp:
 		username = subprocess.run("whoami", capture_output=True, text=True)
 		username = username.stdout.splitlines()[0]
@@ -148,33 +192,36 @@ if len(argv) == 1:
 	print("Usage: argv[0] <source file>")
 	sys.exit(0)
 
-# Spliting the program name from the given file
-# Creating the user_inputs list to store the inputs
+# --- Main Execution ---
 
-basename = argv[1].split('.')[0]
-user_inputs = get_input(basename)
+if __name__ == "__main__":
 
-# Split the extension and decide the programming language
-extension = argv[1].split('.')[-1]
-prog_lang = ''
+	argv = sys.argv
+	if len(argv) == 1:
+		print("Source File Not Found.....")
+		print("Usage: argv[0] <source file>")
+		sys.exit(0)
 
-if extension == 'py':
-	prog_lang = 'Python'
+	basename = argv[1].split('.')[0]
+	user_inputs = get_input(basename)
 
-if extension == 'java':
-	prog_lang = 'Java'
+	extension = argv[1].split('.')[-1]
+	prog_lang = "Python" if extension == 'py' else "Java" if extension == 'java' else None
 
-result = evaluate(basename, extension, user_inputs, argv[1])
+	if not prog_lang:
+		print(f"Unsupported file format: {extension}")
+		sys.exit(0)
 
-# Call the functions based on the result of the Evaluation
-if len(result) == 2:
-	ERROR_OCCURED, status = result
-	update_log(basename, prog_lang, status=status)
-	display_result(ERROR_OCCURED)
-else:
-	ERROR_OCCURED, total_count, fail_count, total_time = result
-	total_time = (total_time / total_count) * 1000
-	
-	update_log(basename, prog_lang, total_count, fail_count, total_time)
-	display_result(ERROR_OCCURED, total_time, total_count, fail_count)
+	result = evaluate(basename, extension, user_inputs, argv[1])
+
+	if len(result) == 2:
+		ERROR_OCCURED, status = result
+		update_log(basename, prog_lang, status=status)
+		display_result(ERROR_OCCURED)
+	else:
+		ERROR_OCCURED, total_count, fail_count, total_time = result
+		total_time = (total_time / total_count) * 1000
+
+		update_log(basename, prog_lang, total_count, fail_count, total_time)
+		display_result(ERROR_OCCURED, total_time, total_count, fail_count)
 
