@@ -6,6 +6,37 @@ import time
 import base64
 import subprocess
 from datetime import datetime
+import textwrap
+
+class Banner:
+
+    def __init__(self, width: int = 60):
+        self.width = width
+        self.heading_width = width - 2
+        self.content_width = width - 25
+        self.separator = "-" * width + '\n'
+        self.no_key_filler = f' |\n| {' ' * 20} '
+
+        self.keys = []
+        self.values = []
+
+    def add_value(self, key: str, value: str | int) -> None:
+        self.keys.append(key)
+        self.values.append(self.get_processed_message(str(value)))
+
+    def get_processed_message(self, message: str) -> str:
+        context = textwrap.fill(message.strip(), self.content_width).split("\n")
+        return self.no_key_filler.join(map(lambda x: f'{x:<{self.content_width}}', context))
+
+    def __repr__(self) -> str:
+        report_lines = [self.separator, f"|{'SUBMISSION REPORT':^{self.heading_width}}|\n", self.separator]
+
+        # Loop through data and format lines efficiently
+        for label, value in zip(self.keys, self.values):
+            report_lines.append(f"| {label:<19}: {value:>{self.content_width}} |\n")
+            report_lines.append(self.separator)
+
+        return "".join(report_lines)
 
 # The function get_input reads the content of the file
 # Decodes the encoded file and split the input ny '-----'
@@ -120,39 +151,19 @@ def evaluate(basename, extension, user_inputs, prog_file):
 # If anyone Test case caused Error , it shows the 'Error Occured'
 # Not display the failed count and passed count
 def display_result(ERROR_OCCURED, total_time = '-', total_count = '-', fail_count = '-'):
-	"""
-	    Displays the submission report in a tabular format.
-
-	    Args:
-	        ERROR_OCCURED (bool): True if an error occurred, False otherwise.
-	        total_time (float, optional): Total execution time. Defaults to '-'.
-	        total_count (int, optional): Total number of test cases. Defaults to '-'.
-	        fail_count (int, optional): Number of failed test cases. Defaults to '-'.
-	"""
 	submission_status = '\u2713' if fail_count == 0 and not ERROR_OCCURED else '\u2717'
 
-	print()
-	print('--------------------------------------------------')
-	print("|\t\tSUBMISSION REPORT \t\t |")
-	print('--------------------------------------------------')
+	banner = Banner(50)
+
 	if ERROR_OCCURED:
-		print("|Status\t\t   :\t\t ERROR OCCURED...|")
-		print('--------------------------------------------------')
+		banner.add_value("Status", "ERROR OCCURED...")
 
 	else:
-		print(f"|Test Case Passed  : \t\t\t\t{total_count - fail_count}|")
-		print('--------------------------------------------------')
-		print(f"|Test Case Failed  : \t\t\t\t{fail_count}|")
-		print('--------------------------------------------------')
-		print(f"|Time Taken        : \t\t\t  ", end = '') #{total_time:.2f}ms|")
-		if total_time < 100:
-			print(f"{total_time:.2f}ms|")
-		else:
-			print(f"{total_time:.1f}ms|")
-		print('--------------------------------------------------')
+		banner.add_value("Test Case Passed", total_count - fail_count)
+		banner.add_value("Test Case Failed", fail_count)
+		banner.add_value("Time Taken", f"{total_time:.2f}ms")
 
-	print(f"|Submission Status : \t\t\t\t{submission_status}|")
-	print('--------------------------------------------------')
+	banner.add_value("Submission Status", submission_status)
 
 # The function update_log logs the result in the CSV format
 # the log file is located in "/var/log/program_lab.log"
